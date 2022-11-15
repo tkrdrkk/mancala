@@ -1,8 +1,2 @@
-# やったこと
-
-https://zenn.dev/hungry_goat/articles/b7ea123eeaaa44
-
-- prettier, eslint-config-prettier のインストール
-- eslint 設定
-- vscode 設定
--
+ドメイン知識の洗い出し
+ドメインオブジェクト、用語の選定
