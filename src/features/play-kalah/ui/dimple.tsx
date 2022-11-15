@@ -1,12 +1,12 @@
 import React from "react";
-import { Stone } from "./stone";
+import { Marble } from "./marble";
 
 export const Dimple = () => {
   return (
     <div style={{ border: "yellowgreen solid 1px", padding: 8 }}>
-      {Array.from({ length: 3 }).map((el, idx) => (
+      {Array.from({ length: 2 }).map((el, idx) => (
         <div key={idx.toString()} style={{ margin: 8 }}>
-          <Stone />
+          <Marble color={idx % 2 === 0 ? "red" : undefined} />
         </div>
       ))}
     </div>
