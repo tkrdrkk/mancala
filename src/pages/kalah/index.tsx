@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
+import { Board } from "@/features/play-kalah/ui/board";
 import styles from "@/styles/Home.module.css";
 
 export default function Home() {
@@ -11,7 +12,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>{`Here's Kalah`}</main>
+      <main className={styles.main}>
+        <Board />
+      </main>
 
       <footer className={styles.footer}>
         <a
