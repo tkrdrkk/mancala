@@ -1,7 +1,7 @@
 import { atom, selector } from "recoil";
 
 export type MarbleView = {
-  id: string;
+  // id: string;
   color: string;
 };
 
@@ -42,6 +42,7 @@ const generateTerritory = (owner: "your" | "opponents") => ({
 type DimpleAsBucket = DimpleView;
 type StoreAsBucket = StoreView;
 type Bucket = DimpleAsBucket | StoreAsBucket;
+type Buckets = Bucket[];
 
 const generateStore = (owner: "your" | "opponents"): Bucket => ({
   id: `${owner}Store`,
@@ -49,20 +50,20 @@ const generateStore = (owner: "your" | "opponents"): Bucket => ({
 });
 const yourStore = generateStore("your");
 const opponentsStore = generateStore("opponents");
-const generateDimples = (owner: "your" | "opponents"): Bucket[] =>
+const generateDimples = (owner: "your" | "opponents"): Buckets =>
   Array.from({ length: 6 })
     .map((_, idx) => idx)
     .map((dimidx) => ({
       id: `${owner}Dimple${dimidx.toString()}`,
       marbles: Array.from({ length: 3 }).map((el, maridx) => ({
-        id: `${owner}Marble${dimidx.toString()}-${maridx.toString()}`,
+        // id: `${owner}Marble${dimidx.toString()}-${maridx.toString()}`,
         color: "blue",
       })),
     }));
 const opponentsDimples = generateDimples("opponents");
 const yourDimples = generateDimples("your");
 // TODO
-export const defaultBucketsAtom: Bucket[] = [
+export const defaultBucketsAtom: Buckets = [
   // プレイヤーのstoreから反時計回りに生成
   yourStore,
   ...opponentsDimples.reverse(),
@@ -70,7 +71,7 @@ export const defaultBucketsAtom: Bucket[] = [
   ...yourDimples,
 ];
 
-export const bucketsAtom = atom<Bucket[]>({
+export const bucketsAtom = atom<Buckets>({
   key: "marbleLocations",
   default: defaultBucketsAtom,
 });
@@ -88,7 +89,7 @@ export const boardViewSelector = selector<BoardView>({
           marbles: [],
         },
         field: {
-          dimples: buckets.filter((b) => b.id.startsWith("yourBucket")),
+          dimples: buckets.filter((b) => b.id.startsWith("yourDimple")),
         },
       },
       opponentsTerritory: {
@@ -97,7 +98,7 @@ export const boardViewSelector = selector<BoardView>({
           marbles: [],
         },
         field: {
-          dimples: buckets.filter((b) => b.id.startsWith("opponentsBucket")),
+          dimples: buckets.filter((b) => b.id.startsWith("opponentsDimple")),
         },
       },
     };
