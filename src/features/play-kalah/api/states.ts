@@ -1,11 +1,11 @@
-import { atom, selector } from "recoil";
+import { atom, selector, selectorFamily } from "recoil";
 
-export type MarbleView = {
-  // id: string;
-  color: string;
-};
+export type MarbleView = { color: string };
+export type Owner = "your" | "opponents";
 
-type BucketId = string;
+export type DimpleId = `${Owner}Dimple${string}`;
+export type StoreId = `${Owner}Store${string}`;
+export type BucketId = DimpleId | StoreId;
 type DimpleView = {
   id: BucketId;
   marbles: MarbleView[];
@@ -23,34 +23,19 @@ export type BoardView = {
   opponentsTerritory: TerritoryView;
 };
 
-const generateTerritory = (owner: "your" | "opponents") => ({
-  store: {
-    id: `${owner}Store`,
-    marbles: [],
-  },
-  field: {
-    dimples: Array.from({ length: 6 }).map((el, dimidx) => ({
-      id: `${owner}Dimple${dimidx.toString()}`,
-      marbles: Array.from({ length: 3 }).map((el, maridx) => ({
-        id: `${owner}Marble${dimidx.toString()}-${maridx.toString()}`,
-        color: "blue",
-      })),
-    })),
-  },
-});
 // StoreとDimpleを数珠つなぎの配列にするための型。ロジック上でしか現れない
 type DimpleAsBucket = DimpleView;
 type StoreAsBucket = StoreView;
 type Bucket = DimpleAsBucket | StoreAsBucket;
 type Buckets = Bucket[];
 
-const generateStore = (owner: "your" | "opponents"): Bucket => ({
+const generateStore = (owner: Owner): Bucket => ({
   id: `${owner}Store`,
   marbles: [],
 });
 const yourStore = generateStore("your");
 const opponentsStore = generateStore("opponents");
-const generateDimples = (owner: "your" | "opponents"): Buckets =>
+const generateDimples = (owner: Owner): Buckets =>
   Array.from({ length: 6 })
     .map((_, idx) => idx)
     .map((dimidx) => ({
@@ -74,6 +59,28 @@ export const defaultBucketsAtom: Buckets = [
 export const bucketsAtom = atom<Buckets>({
   key: "marbleLocations",
   default: defaultBucketsAtom,
+});
+
+export const dimpleSelector = selectorFamily<DimpleView, DimpleId>({
+  key: "dimple",
+  get:
+    (dimpleId) =>
+    ({ get }) => {
+      const buckets = get(bucketsAtom);
+      const dimple = buckets.find((b) => b.id === dimpleId);
+      return dimple || ({} as DimpleView); // FIXME 適当実装、直したい
+    },
+});
+export const storeSelector = selectorFamily<StoreView, StoreId>({
+  key: "store",
+  get:
+    (storeId) =>
+    ({ get }) => {
+      const buckets = get(bucketsAtom);
+      const store = buckets.find((b) => b.id === storeId);
+      // HACK なんかあったらとりあえず空配列
+      return store || ({} as StoreView); // FIXME 適当実装、直したい
+    },
 });
 
 // ロジック上の配置を元に、View用の型に変換

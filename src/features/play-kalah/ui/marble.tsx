@@ -1,6 +1,7 @@
 import React from "react";
+import { MarbleView } from "../api/states";
 
-export const Marble = ({ color = "blue" }: { color?: string }) => {
+export const Marble = ({ color = "blue" }: MarbleView) => {
   return (
     <div
       style={{
