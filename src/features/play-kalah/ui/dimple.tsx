@@ -18,7 +18,7 @@ export const Dimple = ({ id }: { id: DimpleId }) => {
       }}
     >
       {bucket.marbles.map((marble, idx) => (
-        <div key={`${id}-${idx.toString()}`} style={{ margin: 8 }}>
+        <div key={`${id}-${idx.toString()}`} style={{ margin: 2 }}>
           <Marble {...marble} />
         </div>
       ))}
