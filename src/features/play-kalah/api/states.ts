@@ -1,7 +1,7 @@
-import { atom, selector, selectorFamily } from "recoil";
+import { atom, selectorFamily } from 'recoil';
 
 export type MarbleView = { color: string };
-export type Owner = "your" | "opponents";
+export type Owner = 'your' | 'opponents';
 
 export type DimpleId = `${Owner}Dimple${string}`;
 export type StoreId = `${Owner}Store${string}`;
@@ -29,24 +29,26 @@ type StoreAsBucket = StoreView;
 type Bucket = DimpleAsBucket | StoreAsBucket;
 type Buckets = Bucket[];
 
+const colors = ['blue', 'red', 'yellow', 'green', 'yellowgreen', 'orange', 'grey', 'skyblue'];
+const randomColor = () => colors[Math.floor(Math.random() * colors.length)];
+
 const generateStore = (owner: Owner): Bucket => ({
   id: `${owner}Store`,
   marbles: [],
 });
-const yourStore = generateStore("your");
-const opponentsStore = generateStore("opponents");
+const yourStore = generateStore('your');
+const opponentsStore = generateStore('opponents');
 const generateDimples = (owner: Owner): Buckets =>
   Array.from({ length: 6 })
     .map((_, idx) => idx)
     .map((dimidx) => ({
       id: `${owner}Dimple${dimidx.toString()}`,
-      marbles: Array.from({ length: 3 }).map((el, maridx) => ({
-        // id: `${owner}Marble${dimidx.toString()}-${maridx.toString()}`,
-        color: "blue",
+      marbles: Array.from({ length: 3 }).map((el) => ({
+        color: randomColor(),
       })),
     }));
-const opponentsDimples = generateDimples("opponents");
-const yourDimples = generateDimples("your");
+const opponentsDimples = generateDimples('opponents');
+const yourDimples = generateDimples('your');
 // TODO
 export const defaultBucketsAtom: Buckets = [
   // プレイヤーのstoreから反時計回りに生成
@@ -56,13 +58,14 @@ export const defaultBucketsAtom: Buckets = [
   ...yourDimples,
 ];
 
+// HACK atom本体のexportを避けたい
 export const bucketsAtom = atom<Buckets>({
-  key: "marbleLocations",
+  key: 'marbleLocations',
   default: defaultBucketsAtom,
 });
 
 export const dimpleSelector = selectorFamily<DimpleView, DimpleId>({
-  key: "dimple",
+  key: 'dimple',
   get:
     (dimpleId) =>
     ({ get }) => {
@@ -72,7 +75,7 @@ export const dimpleSelector = selectorFamily<DimpleView, DimpleId>({
     },
 });
 export const storeSelector = selectorFamily<StoreView, StoreId>({
-  key: "store",
+  key: 'store',
   get:
     (storeId) =>
     ({ get }) => {
@@ -81,33 +84,4 @@ export const storeSelector = selectorFamily<StoreView, StoreId>({
       // HACK なんかあったらとりあえず空配列
       return store || ({} as StoreView); // FIXME 適当実装、直したい
     },
-});
-
-// ロジック上の配置を元に、View用の型に変換
-export const boardViewSelector = selector<BoardView>({
-  key: "boardView",
-  get: ({ get }) => {
-    // TODO この辺で変換処理
-    const buckets = get(bucketsAtom);
-    return {
-      yourTerritory: {
-        store: buckets.find((b) => b.id === "yourStore") || {
-          id: "yourStore",
-          marbles: [],
-        },
-        field: {
-          dimples: buckets.filter((b) => b.id.startsWith("yourDimple")),
-        },
-      },
-      opponentsTerritory: {
-        store: buckets.find((b) => b.id === "opponentsStore") || {
-          id: "opponentsStore",
-          marbles: [],
-        },
-        field: {
-          dimples: buckets.filter((b) => b.id.startsWith("opponentsDimple")),
-        },
-      },
-    };
-  },
 });
